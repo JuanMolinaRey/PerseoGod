@@ -43,8 +43,12 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public Course getCourse(@PathVariable Long id) {
-        return courseService.findById(id);
+    public ResponseEntity<Course> getCourse(@PathVariable Long id) {
+        Course course = courseService.findById(id);
+        if (course != null) {
+            return ResponseEntity.ok(course);
+        }
+        throw new ResourceNotFoundException("Course not found with id: " + id);
     }
 
     @GetMapping("/all")

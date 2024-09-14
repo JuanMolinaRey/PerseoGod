@@ -4,7 +4,7 @@ import com.Perseo.exception.ResourceNotFoundException;
 import com.Perseo.model.Course;
 import com.Perseo.model.OrderItems;
 import com.Perseo.model.User;
-import com.Perseo.service.OrderService;
+import com.Perseo.service.OrderItemsService;
 import com.Perseo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,10 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
-public class OrderController {
+public class OrderItemsController {
 
     @Autowired
-    private OrderService orderService;
+    private OrderItemsService orderService;
 
     @Autowired
     private UserService userService;
