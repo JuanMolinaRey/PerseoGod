@@ -1,5 +1,6 @@
 package com.Perseo.controller;
 
+import com.Perseo.exception.ResourceNotFoundException;
 import com.Perseo.model.Experience;
 import com.Perseo.service.ExperienceService;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,76 +8,86 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ExperienceControllerTest {
 
-    private MockMvc mockMvc;
+    @Mock
+    private ExperienceService experienceService;
 
     @InjectMocks
     private ExperienceController experienceController;
-
-    @Mock
-    private ExperienceService experienceService;
 
     private Experience experience;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(experienceController).build();
 
-        experience = Experience.builder()
-                .id(1L)
-                .title("Developer")
-                .company("TechCorp")
-                .description("Developed applications")
-                .startDate("2023-01-01")
-                .build();
+        experience = new Experience();
+        experience.setId(1L);
+        experience.setTitle("Developer");
+        experience.setCompany("Tech Inc.");
+        experience.setDescription("Developed applications.");
+        experience.setStartDate("2022-01-01");
+        experience.setEndDate("2023-01-01");
     }
 
     @Test
-    public void testCreateExperience() throws Exception {
+    public void test_Create_Experience() {
         when(experienceService.saveExperience(any(Experience.class))).thenReturn(experience);
 
-        mockMvc.perform(post("/experiences")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"Developer\",\"company\":\"TechCorp\",\"description\":\"Developed applications\",\"startDate\":\"2023-01-01\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("Developer"));
+        ResponseEntity<Experience> response = experienceController.createExperience(experience);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(experience, response.getBody());
     }
 
     @Test
-    public void testGetExperienceById() throws Exception {
-        when(experienceService.getExperienceById(1L)).thenReturn(experience);
+    public void test_Get_Experience_By_Id() {
+        when(experienceService.getExperienceById(anyLong())).thenReturn(experience);
 
-        mockMvc.perform(get("/experiences/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Developer"));
+        ResponseEntity<Experience> response = experienceController.getExperienceById(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(experience, response.getBody());
     }
 
     @Test
-    public void testGetExperiencesByUserId() throws Exception {
-        when(experienceService.getExperiencesByUserId(1L)).thenReturn(List.of(experience));
+    public void test_Get_Experiences_By_User_Id() {
+        List<Experience> experiences = List.of(experience);
+        when(experienceService.getExperiencesByUserId(anyLong())).thenReturn(experiences);
 
-        mockMvc.perform(get("/experiences/user/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Developer"));
+        ResponseEntity<List<Experience>> response = experienceController.getExperiencesByUserId(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(experiences, response.getBody());
     }
 
     @Test
-    public void testDeleteExperience() throws Exception {
-        doNothing().when(experienceService).deleteExperience(1L);
+    public void test_Update_Experience() {
+        when(experienceService.updateExperience(anyLong(), any(Experience.class))).thenReturn(experience);
 
-        mockMvc.perform(delete("/experiences/1"))
-                .andExpect(status().isNoContent());
+        ResponseEntity<Experience> response = experienceController.updateExperience(1L, experience);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(experience, response.getBody());
+    }
+
+    @Test
+    public void test_Delete_Experience() {
+        doNothing().when(experienceService).deleteExperience(anyLong());
+
+        ResponseEntity<Void> response = experienceController.deleteExperience(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }

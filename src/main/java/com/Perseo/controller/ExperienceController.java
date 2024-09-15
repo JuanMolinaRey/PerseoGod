@@ -1,5 +1,6 @@
 package com.Perseo.controller;
 
+import com.Perseo.exception.ResourceNotFoundException;
 import com.Perseo.model.Experience;
 import com.Perseo.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,12 @@ public class ExperienceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Experience> getExperienceById(@PathVariable Long id) {
-        Experience experience = experienceService.getExperienceById(id);
-        return new ResponseEntity<>(experience, HttpStatus.OK);
+        try {
+            Experience experience = experienceService.getExperienceById(id);
+            return new ResponseEntity<>(experience, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/user/{userId}")
@@ -38,9 +43,23 @@ public class ExperienceController {
         return new ResponseEntity<>(experiences, HttpStatus.OK);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Experience> updateExperience(@PathVariable Long id, @RequestBody Experience updatedExperience) {
+        try {
+            Experience experience = experienceService.updateExperience(id, updatedExperience);
+            return new ResponseEntity<>(experience, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExperience(@PathVariable Long id) {
-        experienceService.deleteExperience(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            experienceService.deleteExperience(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

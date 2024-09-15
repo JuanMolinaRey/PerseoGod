@@ -24,13 +24,39 @@ public class OrderItemsController {
     private UserService userService;
 
     @PostMapping("/create")
-    public OrderItems createOrder(@RequestBody OrderItems order) {
-        return orderService.saveOrder(order);
+    public ResponseEntity<OrderItems> createOrder(@RequestBody OrderItems order) {
+        OrderItems savedOrder = orderService.saveOrder(order);
+        return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public OrderItems getOrder(@PathVariable Long id) {
-        return orderService.findById(id);
+    public ResponseEntity<OrderItems> getOrder(@PathVariable Long id) {
+        try {
+            OrderItems order = orderService.findById(id);
+            return new ResponseEntity<>(order, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderItems> updateOrder(@PathVariable Long id, @RequestBody OrderItems updatedOrder) {
+        try {
+            OrderItems order = orderService.updateOrder(id, updatedOrder);
+            return new ResponseEntity<>(order, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        try {
+            orderService.deleteOrder(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/{userId}/add-course")

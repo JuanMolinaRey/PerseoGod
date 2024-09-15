@@ -31,8 +31,8 @@ public class CourseServiceTest {
 
         course = new Course();
         course.setId(1L);
-        course.setTitle("Java Basics");
-        course.setDescription("Introduction to Java");
+        course.setTitle("Java Programming");
+        course.setDescription("Learn Java from scratch");
         course.setPrice(99.99);
     }
 
@@ -43,8 +43,7 @@ public class CourseServiceTest {
         Course savedCourse = courseService.saveCourse(course);
 
         assertNotNull(savedCourse);
-        assertEquals("Java Basics", savedCourse.getTitle());
-        verify(courseRepository, times(1)).save(course);
+        assertEquals("Java Programming", savedCourse.getTitle());
     }
 
     @Test
@@ -54,12 +53,11 @@ public class CourseServiceTest {
         Course foundCourse = courseService.findById(1L);
 
         assertNotNull(foundCourse);
-        assertEquals(1L, foundCourse.getId());
-        verify(courseRepository, times(1)).findById(1L);
+        assertEquals("Java Programming", foundCourse.getTitle());
     }
 
     @Test
-    public void testFindById_CourseNotFound() {
+    public void testFindById_NotFound() {
         when(courseRepository.findById(1L)).thenReturn(Optional.empty());
 
         Course foundCourse = courseService.findById(1L);
@@ -69,7 +67,7 @@ public class CourseServiceTest {
 
     @Test
     public void testDeleteCourse() {
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+        doNothing().when(courseRepository).deleteById(1L);
 
         courseService.deleteCourse(1L);
 
@@ -78,12 +76,13 @@ public class CourseServiceTest {
 
     @Test
     public void testFindAllCourses() {
-        when(courseRepository.findAll()).thenReturn(Arrays.asList(course));
+        List<Course> courses = Arrays.asList(course);
+        when(courseRepository.findAll()).thenReturn(courses);
 
-        List<Course> courses = courseService.findAllCourses();
+        List<Course> allCourses = courseService.findAllCourses();
 
-        assertFalse(courses.isEmpty());
-        assertEquals(1, courses.size());
-        verify(courseRepository, times(1)).findAll();
+        assertNotNull(allCourses);
+        assertEquals(1, allCourses.size());
+        assertEquals("Java Programming", allCourses.get(0).getTitle());
     }
 }

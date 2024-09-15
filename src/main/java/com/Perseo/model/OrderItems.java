@@ -1,6 +1,7 @@
 package com.Perseo.model;
 
 import jakarta.persistence.*;
+import jdk.jshell.Snippet;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -34,4 +35,5 @@ public class OrderItems {
 
     @Column(nullable = false)
     private String status;
+
 }

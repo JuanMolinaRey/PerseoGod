@@ -2,12 +2,14 @@ package com.Perseo.service;
 
 import com.Perseo.model.Experience;
 import com.Perseo.repository.IExperienceRepository;
+import com.Perseo.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,66 +24,54 @@ public class ExperienceServiceTest {
     @Mock
     private IExperienceRepository experienceRepository;
 
+    private Experience experience;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        experience = Experience.builder()
+                .id(1L)
+                .title("Software Engineer")
+                .company("Tech Corp")
+                .description("Developed software solutions")
+                .startDate("2020-01-01")
+                .endDate("2023-01-01")
+                .build();
     }
 
     @Test
     public void testSaveExperience() {
-        Experience experience = Experience.builder()
-                .id(1L)
-                .title("Developer")
-                .company("TechCorp")
-                .description("Developed applications")
-                .startDate("2023-01-01")
-                .build();
-
         when(experienceRepository.save(any(Experience.class))).thenReturn(experience);
 
         Experience savedExperience = experienceService.saveExperience(experience);
 
         assertNotNull(savedExperience);
-        assertEquals("Developer", savedExperience.getTitle());
+        assertEquals("Software Engineer", savedExperience.getTitle());
         verify(experienceRepository, times(1)).save(experience);
     }
 
     @Test
     public void testGetExperiencesByUserId() {
-        Experience experience = Experience.builder()
-                .id(1L)
-                .title("Developer")
-                .company("TechCorp")
-                .description("Developed applications")
-                .startDate("2023-01-01")
-                .build();
+        List<Experience> experiences = Arrays.asList(experience);
+        when(experienceRepository.findByUserId(1L)).thenReturn(experiences);
 
-        when(experienceRepository.findByUserId(1L)).thenReturn(List.of(experience));
+        List<Experience> result = experienceService.getExperiencesByUserId(1L);
 
-        List<Experience> experiences = experienceService.getExperiencesByUserId(1L);
-
-        assertFalse(experiences.isEmpty());
-        assertEquals(1, experiences.size());
-        assertEquals("Developer", experiences.get(0).getTitle());
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Software Engineer", result.get(0).getTitle());
         verify(experienceRepository, times(1)).findByUserId(1L);
     }
 
     @Test
     public void testGetExperienceById() {
-        Experience experience = Experience.builder()
-                .id(1L)
-                .title("Developer")
-                .company("TechCorp")
-                .description("Developed applications")
-                .startDate("2023-01-01")
-                .build();
-
         when(experienceRepository.findById(1L)).thenReturn(Optional.of(experience));
 
         Experience foundExperience = experienceService.getExperienceById(1L);
 
         assertNotNull(foundExperience);
-        assertEquals("Developer", foundExperience.getTitle());
+        assertEquals("Software Engineer", foundExperience.getTitle());
         verify(experienceRepository, times(1)).findById(1L);
     }
 
@@ -89,19 +79,66 @@ public class ExperienceServiceTest {
     public void testGetExperienceById_NotFound() {
         when(experienceRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        assertThrows(ResourceNotFoundException.class, () -> {
             experienceService.getExperienceById(1L);
         });
+    }
 
-        assertEquals("Experience not found", exception.getMessage());
+    @Test
+    public void testUpdateExperience() {
+        Experience updatedExperience = Experience.builder()
+                .id(1L)
+                .title("Senior Software Engineer")
+                .company("Tech Corp")
+                .description("Led software development teams")
+                .startDate("2020-01-01")
+                .endDate("2024-01-01")
+                .build();
+
+        when(experienceRepository.findById(1L)).thenReturn(Optional.of(experience));
+        when(experienceRepository.save(any(Experience.class))).thenReturn(updatedExperience);
+
+        Experience result = experienceService.updateExperience(1L, updatedExperience);
+
+        assertNotNull(result);
+        assertEquals("Senior Software Engineer", result.getTitle());
         verify(experienceRepository, times(1)).findById(1L);
+        verify(experienceRepository, times(1)).save(updatedExperience);
+    }
+
+    @Test
+    public void testUpdateExperience_NotFound() {
+        Experience updatedExperience = Experience.builder()
+                .id(1L)
+                .title("Senior Software Engineer")
+                .company("Tech Corp")
+                .description("Led software development teams")
+                .startDate("2020-01-01")
+                .endDate("2024-01-01")
+                .build();
+
+        when(experienceRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            experienceService.updateExperience(1L, updatedExperience);
+        });
     }
 
     @Test
     public void testDeleteExperience() {
-        doNothing().when(experienceRepository).deleteById(1L);
+        when(experienceRepository.existsById(1L)).thenReturn(true);
 
-        assertDoesNotThrow(() -> experienceService.deleteExperience(1L));
+        experienceService.deleteExperience(1L);
+
         verify(experienceRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testDeleteExperience_NotFound() {
+        when(experienceRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            experienceService.deleteExperience(1L);
+        });
     }
 }
