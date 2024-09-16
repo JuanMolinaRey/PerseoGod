@@ -12,46 +12,46 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final IUserRepository userRepository;
+    private final IUserRepository iUserRepository;
 
     @Autowired
     public UserService(IUserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.iUserRepository = userRepository;
     }
 
     public User saveUser(User user) {
-        return userRepository.save(user);
+        return iUserRepository.save(user);
     }
 
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return iUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     public User findById(Long id) {
-        return userRepository.findById(id)
+        return iUserRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
     }
 
     public User updateUser(Long id, User updatedUser) {
-        User existingUser = userRepository.findById(id)
+        User existingUser = iUserRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
 
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setPassword(updatedUser.getPassword());
 
-        return userRepository.save(existingUser);
+        return iUserRepository.save(existingUser);
     }
 
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
+        if (!iUserRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found with ID: " + id);
         }
 
-        userRepository.deleteById(id);
+        iUserRepository.deleteById(id);
     }
 
     public List<User> findAllUsers() {
-        return userRepository.findAll();
+        return iUserRepository.findAll();
     }
 }

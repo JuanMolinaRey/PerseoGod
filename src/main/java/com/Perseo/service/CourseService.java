@@ -10,22 +10,22 @@ import java.util.List;
 @Service
 public class CourseService {
     @Autowired
-    private ICourseRepository icourseRepository;
+    private ICourseRepository iCourseRepository;
 
     public Course saveCourse(Course course) {
-        return icourseRepository.save(course);
+        return iCourseRepository.save(course);
     }
 
     public Course findById(Long id) {
-        return icourseRepository.findById(id).orElse(null);
+        return iCourseRepository.findById(id).orElse(null);
     }
 
     public void deleteCourse(Long id) {
-        icourseRepository.deleteById(id);
+        iCourseRepository.deleteById(id);
     }
 
     public List<Course> findAllCourses() {
-        return icourseRepository.findAll();
+        return iCourseRepository.findAll();
     }
 }
 

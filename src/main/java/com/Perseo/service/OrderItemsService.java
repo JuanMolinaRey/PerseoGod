@@ -9,19 +9,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderItemsService {
     @Autowired
-    private IOrderRepository iorderRepository;
+    private IOrderRepository iOrderRepository;
 
     public OrderItems saveOrder(OrderItems order) {
-        return iorderRepository.save(order);
+        return iOrderRepository.save(order);
     }
 
     public OrderItems findById(Long id) {
-        return iorderRepository.findById(id)
+        return iOrderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + id));
     }
 
     public OrderItems updateOrder(Long id, OrderItems updatedOrder) {
-        OrderItems existingOrder = iorderRepository.findById(id)
+        OrderItems existingOrder = iOrderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + id));
 
         existingOrder.setUser(updatedOrder.getUser());
@@ -29,14 +29,14 @@ public class OrderItemsService {
         existingOrder.setTotalPrice(updatedOrder.getTotalPrice());
         existingOrder.setStatus(updatedOrder.getStatus());
 
-        return iorderRepository.save(existingOrder);
+        return iOrderRepository.save(existingOrder);
     }
 
     public void deleteOrder(Long id) {
-        if (!iorderRepository.existsById(id)) {
+        if (!iOrderRepository.existsById(id)) {
             throw new ResourceNotFoundException("Order not found with ID: " + id);
         }
 
-        iorderRepository.deleteById(id);
+        iOrderRepository.deleteById(id);
     }
 }

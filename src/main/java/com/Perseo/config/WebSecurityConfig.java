@@ -32,6 +32,11 @@ public class WebSecurityConfig {
                                 .loginPage("/login")
                                 .permitAll()
                 )
+                .oauth2Login(oauth2Login ->
+                        oauth2Login
+                                .defaultSuccessUrl("/home", true)
+                                .failureUrl("/login?error")
+                )
                 .logout(LogoutConfigurer::permitAll)
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling

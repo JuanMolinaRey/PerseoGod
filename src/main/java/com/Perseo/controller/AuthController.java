@@ -26,13 +26,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    @PostMapping("/linkedin")
-    public ResponseEntity<AuthResponse> linkedinLogin(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok().build();
+    @GetMapping("/linkedin")
+    public ResponseEntity<String> linkedinLogin() {
+        return ResponseEntity.ok("LinkedIn login initiated");
     }
 
-    @PostMapping("/github")
-    public ResponseEntity<AuthResponse> githubLogin(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok().build();
+    @GetMapping("/github")
+    public ResponseEntity<String> githubLogin() {
+        return ResponseEntity.ok("GitHub login initiated");
     }
 }
